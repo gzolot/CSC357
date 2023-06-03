@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "name": "acceptance test",
+      "setup": "make && wget -O a6_tests.tgz -q https://github.com/amigler/csc357-s23/blob/main/a6/a6_tests.tgz?raw=true && tar -xf a6_tests.tgz && chmod 755 ag_test.sh",
+      "run": "./ag_test.sh",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 5,
+      "points": null
+    }
+  ]
+}
