@@ -1,0 +1,12 @@
+#include <unistd.h>
+#include <stdio.h>
+#include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <ctype.h>
+#include <string.h>
+#include <signal.h>
+#include <stdlib.h>
+#include "array_list.h"
+#include "hashtable.h"
