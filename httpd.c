@@ -55,13 +55,13 @@ void send_HTTP_response(int socket, char *http_type, char *response_type, char *
 		printf("file: %s\n", file_path);
 		fflush(stdout);
              	if (file == NULL){
-			printf("0: %c, 1: %c\n", file_path[0], file_path[1]);
-			fflush(stdout);
+			//printf("0: %c, 1: %c\n", file_path[0], file_path[1]);
+			//fflush(stdout);
 			if (file_path[0] == 'k' && file_path[1] == 'v'){
 				kv = 1;
 				strcpy(key, &file_path[3]);
-				printf("key = %s\n", key);
-				fflush(stdout);	
+				//printf("key = %s\n", key);
+				//fflush(stdout);	
 			}
 			else{
 				strcat(send_buffer, " 404 Not Found\r\n"); //Content-Type: text/html\r\n");
@@ -103,15 +103,17 @@ void send_HTTP_response(int socket, char *http_type, char *response_type, char *
 	}
 	if (!strcmp(response_type, "PUT") || kv == 1){
 		strcpy(key, &file_path[3]);
-		if(kv){
-		;		
-		}
 		//printf("key: %s, content: %s, fifo: %s\n", key, content, fifo_file);
 		strcat(send_buffer, " 200 OK\r\nContent-Length: 0\r\n\r\n");
 		if(send(socket, send_buffer, strlen(send_buffer), 0) == -1){
                   	printf("could not send send_buffer\n");
-               	}	
-		execlp("./kvclient", "./kvclient", fifo_file, "set", key, content, NULL);
+               	}
+		if(kv){
+                        execlp("./kvclient", "./kvclient", fifo_file, "get", key, NULL);
+                }
+		else{	
+			execlp("./kvclient", "./kvclient", fifo_file, "set", key, content, NULL);
+		}
 	}
 }
 
