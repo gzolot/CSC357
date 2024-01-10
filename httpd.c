@@ -51,10 +51,10 @@ void send_HTTP_response(int socket, char *http_type, char *response_type, char *
 	char key[20]= "";
 	if(!strcmp(response_type, "GET") || !strcmp(response_type, "HEAD")){
 		//printf("inside GET condition\n");
-            	FILE *file = fopen(file_path, "r");
-		printf("file: %s\n", file_path);
+        FILE *file = fopen(file_path, "r");
+		//printf("file: %s\n", file_path);
 		fflush(stdout);
-             	if (file == NULL){
+        if (file == NULL){
 			//printf("0: %c, 1: %c\n", file_path[0], file_path[1]);
 			//fflush(stdout);
 			if (file_path[0] == 'k' && file_path[1] == 'v'){
@@ -66,17 +66,17 @@ void send_HTTP_response(int socket, char *http_type, char *response_type, char *
 			else{
 				strcat(send_buffer, " 404 Not Found\r\n"); //Content-Type: text/html\r\n");
 				//strcat(send_buffer, "Content-Length: 0\r\n");  // Set the content length (0 in this case)
-            			strcat(send_buffer, "\r\n"); 
+            	strcat(send_buffer, "\r\n"); 
 				printf("print_buffer: %s\n", send_buffer);
 				fflush(stdout);
-                 		if(send(socket, send_buffer, strlen(send_buffer), 0)==-1){
+                if(send(socket, send_buffer, strlen(send_buffer), 0)==-1){
 				 	printf("could not send send_buffer\n");
 				}
 			}
-           	}
-              	else{
-                 	struct stat file_info;
-                     	if (stat(file_path, &file_info) ==0){
+        }
+        else{
+            struct stat file_info;
+            if (stat(file_path, &file_info) ==0){
 				strcat(send_buffer, " 200 OK\r\nContent-Type: text/html\r\nContent-Length: ");
 				char content_length_buff[50];
 				sprintf(content_length_buff, "%ld", file_info.st_size);
@@ -92,14 +92,14 @@ void send_HTTP_response(int socket, char *http_type, char *response_type, char *
 				if(send(socket, send_buffer, strlen(send_buffer), 0) == -1){
 					printf("could not send send_buffer\n");
 				}	
-                  	}
+            }
 			else{
 				strcat(send_buffer, " 400 Bad Request\r\n"); 	
-                       		if(send(socket, send_buffer, strlen(send_buffer), 0) == -1){
-                                   	printf("could not send send_buffer\n");
-                                }
-                   	}
-          	}
+                    if(send(socket, send_buffer, strlen(send_buffer), 0) == -1){
+                        printf("could not send send_buffer\n");
+                    }
+            }
+        }
 	}
 	if (!strcmp(response_type, "PUT") || kv == 1){
 		strcpy(key, &file_path[3]);
@@ -109,9 +109,11 @@ void send_HTTP_response(int socket, char *http_type, char *response_type, char *
                   	printf("could not send send_buffer\n");
                	}
 		if(kv){
-                        execlp("./kvclient", "./kvclient", fifo_file, "get", key, NULL);
-                }
+			printf("inside kv condition\n");
+            execlp("./kvclient", "./kvclient", fifo_file, "get", key, NULL);
+        }
 		else{	
+			printf("key: %s, content: %s, fifo: %s\n", key, content, fifo_file);
 			execlp("./kvclient", "./kvclient", fifo_file, "set", key, content, NULL);
 		}
 	}
@@ -133,8 +135,8 @@ int main(int argc, char *argv[]){
                 printf("could not process SIGQUIT\n");
         }
 	//int mlen = 10000;
-    	struct sockaddr_in sa, newsockinfo, peerinfo;
-    	socklen_t len;
+	struct sockaddr_in sa, newsockinfo, peerinfo;
+	socklen_t len;
     	
 	//char localaddr[INET_ADDRSTRLEN], peeraddr[INET_ADDRSTRLEN], buff[MAXLEN+1];
 	sock_fd = socket(AF_INET, SOCK_STREAM,0);
@@ -154,6 +156,7 @@ int main(int argc, char *argv[]){
 			int bytes_read;
 
 			bytes_read = recv(newsock, buffer, BUFFER_SIZE - 1, 0);
+			// printf("bytes_read = %d", bytes_read);
 			if (bytes_read == -1) {
     				printf("could not read data\n");
 			} 
@@ -162,7 +165,7 @@ int main(int argc, char *argv[]){
 			} 
 			else {
    		 		buffer[bytes_read] = '\0';
-				printf("%s",buffer);
+				printf("%s\n",buffer);
 				char* content_start = strstr(buffer, "\r\n\r\n") + 4;  // Find the start of the content
     				//printf("Content: %s\n", content_start);
 				char *response_type = oneWord(buffer, 1);

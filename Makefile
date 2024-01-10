@@ -32,3 +32,6 @@ hashtable.o : hashtable.c hashtable.h
 
 httpd.o : httpd.c httpd.h
 	$(CC) $(CFLAGS) -c httpd.c
+
+clean :
+	rm *.o $(MAIN) $(SECOND) $(THIRD)
